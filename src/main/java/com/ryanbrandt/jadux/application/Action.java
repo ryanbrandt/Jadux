@@ -1,16 +1,16 @@
-package com.ryanbrandt.jadux.action;
+package com.ryanbrandt.jadux.application;
 
 import com.ryanbrandt.jadux.models.Payload;
 
 /**
  * Actions represent how we want to update our applications Store. Actions point
- * to a registered ActionType via actionTypeRef and send data through a Payload
+ * to a registered ActionType via actionType and send data through a Payload
  * instance.
  * 
  * @author Ryan Brandt
  */
-public final class Action {
-    private String actionTypeRef;
+public class Action {
+    private ActionType actionType;
     private Payload payload;
 
     /**
@@ -19,8 +19,8 @@ public final class Action {
      * @param actionTypeRef The ActionType reference
      * @param payload       The Action payload
      */
-    public Action(String actionTypeRef, Payload payload) {
-        this.actionTypeRef = actionTypeRef;
+    protected Action(ActionType actionType, Payload payload) {
+        this.actionType = actionType;
         this.payload = payload;
     }
 
@@ -29,17 +29,26 @@ public final class Action {
      * 
      * @param actionTypeRef The ActionType reference
      */
-    public Action(String actionTypeRef) {
-        this(actionTypeRef, null);
+    public Action(ActionType actionType) {
+        this(actionType, null);
     }
 
     /**
-     * ActionType reference getter
+     * ActionType instance getter
      * 
      * @return The ActionType reference associated with the Action
      */
-    public String getType() {
-        return this.actionTypeRef;
+    public ActionType getType() {
+        return this.actionType;
+    }
+
+    /**
+     * ActionType.type getter, predominately for usage in Reducers
+     * 
+     * @return The ActionType.type associated with the Action
+     */
+    public String getTypeName() {
+        return this.actionType.getType();
     }
 
     /**

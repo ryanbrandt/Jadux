@@ -3,7 +3,7 @@ package com.ryanbrandt.jadux.application;
 import java.util.HashMap;
 
 import com.ryanbrandt.jadux.reducer.Reducer;
-import com.ryanbrandt.jadux.action.ActionType;
+import com.ryanbrandt.jadux.models.Payload;
 
 /**
  * Jadux global, maintains a singleton Store and ArrayList of application
@@ -13,8 +13,9 @@ import com.ryanbrandt.jadux.action.ActionType;
  */
 public final class Jadux {
     private static Store store;
-    private static HashMap<String, ActionType> actionTypes;
-    private static HashMap<String, Reducer> reducers;
+    private static HashMap<String, ActionType> actionTypes = new HashMap<>();
+    private static HashMap<ActionType, Action> actions = new HashMap<>();
+    private static HashMap<String, Reducer> reducers = new HashMap<>();
 
     private Jadux() {
     }
@@ -35,6 +36,10 @@ public final class Jadux {
     }
 
     /**
+     * USER SETTERS
+     */
+
+    /**
      * Registers a new application Reducer, referable via reducerRef. All
      * reducerRefs must be unique.
      * 
@@ -52,27 +57,103 @@ public final class Jadux {
     }
 
     /**
-     * Registers a new application ActionType referable via actionTypeRef. All
-     * actionTypeRefs must be unique.
+     * Registers a new application ActionType. Simple method to allow users to
+     * register new ActionTypes (e.g. Redux's const ACTION_TYPE = "ACTION_TYPE") in
+     * a simple method, rather than a definition file
      * 
-     * @param actionTypeRef A string reference to the added ActionType. Must be
-     *                      unique.
-     * @param actionType    The ActionType added to the application
-     * @throws InvalidReducerReferenceException   When an invalid reducerRef is
-     *                                            provided on actionType
-     * @throws UniqueActionTypeReferenceException When a duplicate ActionType
-     *                                            reference is provided
+     * @param actionTypeReference The reference (name) of the ActionType to be added
+     * @throws UniqueActionTypeReferenceException When a duplicate ActionType is
+     *                                            attempted to be defined
+     *
      */
-    public static void registerActionType(String actionTypeRef, ActionType actionType)
-            throws InvalidReducerReferenceException, UniqueActionTypeReferenceException {
-        if (Jadux.actionTypes.containsKey(actionTypeRef)) {
+    public static void registerActionType(String actionTypeReference) throws UniqueActionTypeReferenceException {
+        if (Jadux.actionTypes.containsKey(actionTypeReference)) {
             throw new UniqueActionTypeReferenceException();
         }
 
-        if (!Jadux.reducers.containsKey(actionType.getReducerRef())) {
-            throw new InvalidReducerReferenceException();
+        Jadux.actionTypes.put(actionTypeReference, new ActionType(actionTypeReference));
+        System.out.println(Jadux.actionTypes);
+    }
+
+    /**
+     * Registers a new application Action, which users can then instantiate with
+     * getApplicationAction() for Dispatch.send()
+     * 
+     * @param actionType The name of the ActionType the Action is to be associated
+     *                   with
+     * @param payload    The Payload object to be sent with the Action
+     * @throws UniqueActionException           If Action to be registered is not
+     *                                         unique (an Action is already
+     *                                         associated with this ActionType)
+     * @throws ActionTypeDoesNotExistException If ActionType to be associated with
+     *                                         does not exist
+     */
+    public static void registerAction(String actionType, Payload payload)
+            throws UniqueActionException, ActionTypeDoesNotExistException {
+        final ActionType associatedActionType = getActionType(actionType);
+        if (Jadux.actions.containsKey(associatedActionType)) {
+            throw new UniqueActionException();
         }
 
-        Jadux.actionTypes.put(actionTypeRef, actionType);
+        Jadux.actions.put(associatedActionType, new Action(associatedActionType, payload));
+    }
+
+    /**
+     * Registers a new application Action, which users can then instantiate with
+     * getApplicationAction() for Dispatch.send()
+     * 
+     * @param actionType The name of the ActionType the Action is to be associated
+     *                   with
+     * @throws UniqueActionException           If Action to be registered is not
+     *                                         unique (an Action is already
+     *                                         associated with this ActionType)
+     * @throws ActionTypeDoesNotExistException If ActionType to be associated with
+     *                                         does not exist
+     */
+    public static void registerAction(String actionType) throws UniqueActionException, ActionTypeDoesNotExistException {
+        registerAction(actionType, null);
+    }
+
+    /**
+     * USER GETTERS
+     */
+
+    /**
+     * Grabs a user registered Action so a user can dispatch an action (e.g.
+     * Dispatch.send(getApplicationAction("MY_ACTION")))
+     * 
+     * @param actionType The name of the associated ActionType
+     * @throws ActionTypeDoesNotExistException If the associated ActionType does not
+     *                                         exist
+     * @throws ActionDoesNotExistException     If the associated ActionType exists,
+     *                                         but no Action has been registered
+     *                                         with it
+     * @return The Action instance associated with the ActionType
+     */
+    public static Action getApplicationAction(String actionType)
+            throws ActionTypeDoesNotExistException, ActionDoesNotExistException {
+        final ActionType associatedActionType = getActionType(actionType);
+        if (!Jadux.actions.containsKey(associatedActionType)) {
+            throw new ActionDoesNotExistException();
+        }
+
+        return Jadux.actions.get(associatedActionType);
+    }
+
+    /**
+     * JADUX INTERNAL
+     */
+
+    private static ActionType getActionType(String actionType) throws ActionTypeDoesNotExistException {
+        if (!Jadux.actionTypes.containsKey(actionType)) {
+            for (String s : Jadux.actionTypes.keySet()) {
+                System.out.println(Jadux.actionTypes.get(s));
+            }
+            System.out.println("FOO");
+            System.out.println(Jadux.actionTypes);
+            throw new ActionTypeDoesNotExistException();
+        }
+
+        return Jadux.actionTypes.get(actionType);
     }
 }

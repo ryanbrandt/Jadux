@@ -1,6 +1,6 @@
 package com.ryanbrandt.jadux.reducer;
 
-import com.ryanbrandt.jadux.action.Action;
+import com.ryanbrandt.jadux.application.Action;
 
 /**
  * Master interface for reducers. Mandates a reduce method which takes an action
