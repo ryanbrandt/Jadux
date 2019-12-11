@@ -6,8 +6,8 @@ import com.ryanbrandt.jadux.reducer.Reducer;
 import com.ryanbrandt.jadux.models.Payload;
 
 /**
- * Jadux global, maintains a singleton Store and ArrayList of application
- * Reducers. Static references only.
+ * Jadux global, maintains a singleton Store and Maps of application Reducers,
+ * ActionTypes and Actions. Static references only.
  * 
  * @author Ryan Brandt
  */
