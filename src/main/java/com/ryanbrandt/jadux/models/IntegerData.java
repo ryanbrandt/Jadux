@@ -1,6 +1,11 @@
 package com.ryanbrandt.jadux.models;
 
-public final class IntegerData implements Data {
+/**
+ * A generic integer JaduxData type.
+ * 
+ * @author Ryan Brandt
+ */
+public final class IntegerData implements JaduxData {
     private Integer value;
 
     public IntegerData(int value) {

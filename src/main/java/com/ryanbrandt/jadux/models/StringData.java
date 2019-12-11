@@ -1,6 +1,11 @@
 package com.ryanbrandt.jadux.models;
 
-public final class StringData implements Data {
+/**
+ * Generic string JaduxData type.
+ * 
+ * @author Ryan Brandt
+ */
+public final class StringData implements JaduxData {
     private String value;
 
     public StringData(String value) {

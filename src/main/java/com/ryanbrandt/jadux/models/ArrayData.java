@@ -2,7 +2,13 @@ package com.ryanbrandt.jadux.models;
 
 import java.util.ArrayList;
 
-public final class ArrayData implements Data {
+/**
+ * A generic ArrayList JaduxData type. Provides an ArrayList for any Object
+ * subclass (String, Integer, MyObject).
+ * 
+ * @@author Ryan Brandt
+ */
+public final class ArrayData implements JaduxData {
     private ArrayList<Object> value;
 
     public ArrayData(ArrayList<Object> value) {
@@ -10,7 +16,7 @@ public final class ArrayData implements Data {
     }
 
     public String getType() {
-        return "Array";
+        return "ArrayList<Object>";
     }
 
     public ArrayList<Object> getValue() {

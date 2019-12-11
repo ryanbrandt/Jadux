@@ -6,14 +6,14 @@ package com.ryanbrandt.jadux.models;
  * @author Ryan Brandt
  */
 public final class Payload {
-    private Data data;
+    private JaduxData data;
 
     /**
      * Jadux Data object getter
      * 
      * @return Data object associated with payload
      */
-    public Data getData() {
+    public JaduxData getData() {
         return this.data;
     }
 }

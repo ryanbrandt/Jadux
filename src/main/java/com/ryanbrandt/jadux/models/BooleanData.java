@@ -1,6 +1,11 @@
 package com.ryanbrandt.jadux.models;
 
-public final class BooleanData implements Data {
+/**
+ * A generic boolean JaduxData type.
+ * 
+ * @author Ryan Brandt
+ */
+public final class BooleanData implements JaduxData {
     private Boolean value;
 
     public BooleanData(Boolean value) {

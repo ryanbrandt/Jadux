@@ -6,7 +6,7 @@ package com.ryanbrandt.jadux.models;
  * 
  * @author Ryan Brandt
  */
-public interface Data {
+public interface JaduxData {
 
     /**
      * Data object value type getter
