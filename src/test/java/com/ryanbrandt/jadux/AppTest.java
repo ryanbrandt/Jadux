@@ -3,11 +3,9 @@ package com.ryanbrandt.jadux;
 import static org.junit.Assert.fail;
 
 import com.ryanbrandt.jadux.application.Action;
-import com.ryanbrandt.jadux.application.ActionTypeDoesNotExistException;
 import com.ryanbrandt.jadux.application.Jadux;
 import com.ryanbrandt.jadux.application.StoreAlreadyExistsException;
 import com.ryanbrandt.jadux.application.UniqueActionException;
-import com.ryanbrandt.jadux.application.UniqueActionTypeReferenceException;
 import com.ryanbrandt.jadux.application.UniqueReducerReferenceException;
 import com.ryanbrandt.jadux.reducer.Reducer;
 
@@ -29,8 +27,7 @@ public class AppTest {
     @Test
     public void AppTestMain() {
         shouldCreateSingletonStore();
-        shouldCreateUniqueActionTypes();
-        shouldCreateUniqueActionsWithExistingActionTypes();
+        shouldCreateUniqueActions();
         shouldCreateUniqueReducersByReference();
     }
 
@@ -50,40 +47,17 @@ public class AppTest {
 
     }
 
-    public void shouldCreateUniqueActionTypes() {
+    public void shouldCreateUniqueActions() {
         try {
-            Jadux.registerActionType("MY_TEST_ACTION_TYPE");
-        } catch (UniqueActionTypeReferenceException e) {
-            fail("Test threw UniqueActionTypeReferenceException when ActionType does not exist");
-        }
-
-        try {
-            Jadux.registerActionType("MY_TEST_ACTION_TYPE");
-            fail("Test failed to throw UniqueActionTypeReferenceEXception when ActionType already exists");
-        } catch (UniqueActionTypeReferenceException e) {
-
-        }
-
-    }
-
-    public void shouldCreateUniqueActionsWithExistingActionTypes() {
-        try {
-            Jadux.registerAction("MY_TEST_ACTION_TYPE");
-        } catch (UniqueActionException | ActionTypeDoesNotExistException e) {
+            Jadux.registerAction("MY_TEST_ACTION");
+        } catch (UniqueActionException e) {
             fail("Test threw " + e.getClass().getName() + " when ActionType was registered and Action was unique");
         }
 
         try {
-            Jadux.registerAction("MY_TEST_ACTION_TYPE");
+            Jadux.registerAction("MY_TEST_ACTION");
             fail("Test failed to throw an exception when Action was already registered");
-        } catch (UniqueActionException | ActionTypeDoesNotExistException e) {
-
-        }
-
-        try {
-            Jadux.registerAction("AN_UNREGISTERED_ACTION_TYPE");
-            fail("Test failed to throw ActionTypeDoesNotExistException when associated ActionType does not exist");
-        } catch (UniqueActionException | ActionTypeDoesNotExistException e) {
+        } catch (UniqueActionException e) {
 
         }
     }
@@ -93,6 +67,7 @@ public class AppTest {
         public void reduce(Action a) {
 
         }
+
     }
 
     public void shouldCreateUniqueReducersByReference() {
