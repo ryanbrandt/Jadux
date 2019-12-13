@@ -1,6 +1,9 @@
 package com.ryanbrandt.jadux.reducer;
 
-import com.ryanbrandt.jadux.application.Action;
+import java.util.HashMap;
+
+import com.ryanbrandt.jadux.action.Action;
+import com.ryanbrandt.jadux.models.JaduxData;
 
 /**
  * Master interface for reducers. Mandates a reduce method which takes an action
@@ -15,5 +18,5 @@ public interface Reducer {
      * 
      * @param a The Action to act on State
      */
-    public void reduce(Action a);
+    public HashMap<String, JaduxData> reduce(Action<? extends JaduxData> a, HashMap<String, JaduxData> state);
 }

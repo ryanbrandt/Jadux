@@ -2,7 +2,7 @@ package com.ryanbrandt.jadux.application;
 
 import java.util.HashMap;
 
-import com.ryanbrandt.jadux.models.Payload;;
+import com.ryanbrandt.jadux.models.JaduxData;
 
 /**
  * Defines the applications State storage
@@ -10,14 +10,14 @@ import com.ryanbrandt.jadux.models.Payload;;
  * @author Ryan Brandt
  */
 public final class Store {
-    private HashMap<String, Payload> storage;
+    private HashMap<String, JaduxData> state;
 
     /**
      * Store constructor, only to be called from Jadux.createStore(). Instantiates a
      * HashMap to maintain state in the form of (String, Payload) key-values
      */
     protected Store() {
-        this.storage = new HashMap<String, Payload>();
+        this.state = new HashMap<String, JaduxData>();
     }
 
     /**
@@ -26,8 +26,12 @@ public final class Store {
      * 
      * @return The HashMap of (String, Payload) key-values maintaining state
      */
-    protected HashMap<String, Payload> getStore() {
-        return this.storage;
+    protected HashMap<String, JaduxData> getState() {
+        return this.state;
+    }
+
+    protected void updateState(HashMap<String, JaduxData> updatedState) {
+
     }
 
 }

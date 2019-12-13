@@ -3,7 +3,8 @@ package com.ryanbrandt.jadux.application;
 import java.util.HashMap;
 
 import com.ryanbrandt.jadux.reducer.Reducer;
-import com.ryanbrandt.jadux.models.Payload;
+import com.ryanbrandt.jadux.action.Action;
+import com.ryanbrandt.jadux.models.JaduxData;
 
 /**
  * Jadux global, maintains a singleton Store and Maps of application Reducers,
@@ -13,7 +14,7 @@ import com.ryanbrandt.jadux.models.Payload;
  */
 public final class Jadux {
     private static Store store;
-    private static HashMap<String, Action> actions = new HashMap<>();
+    private static HashMap<String, Action<? extends JaduxData>> actions = new HashMap<>();
     private static HashMap<String, Reducer> reducers = new HashMap<>();
 
     private Jadux() {
@@ -35,80 +36,63 @@ public final class Jadux {
     }
 
     /**
-     * USER SETTERS
-     */
-
-    /**
-     * Registers a new application Reducer, referable via reducerRef. All
-     * reducerRefs must be unique.
+     * Registers a new application Reducer
      * 
-     * @param reducerRef A string reference to the added Reducer. Must be unique.
-     * @param reducer    The Reducer added to the application
-     * @throws UniqueReducerReferenceException When a duplicate reducerRef is
-     *                                         provided
+     * @param reducer The Reducer added to the application
      */
-    public static void registerReducer(String reducerRef, Reducer reducer) throws UniqueReducerReferenceException {
-        if (Jadux.reducers.containsKey(reducerRef)) {
-            throw new UniqueReducerReferenceException();
-        }
-
-        Jadux.reducers.put(reducerRef, reducer);
+    public static void registerReducer(Reducer reducer) {
+        Jadux.reducers.put(reducer.getClass().getName(), reducer);
     }
 
     /**
      * Registers a new application Action, which users can then instantiate with
      * getApplicationAction() for Dispatch.send()
      * 
-     * @param actionType The name/type of the Action to be registered
-     * @param payload    The Payload object to be sent with the Action
+     * @param action The new Action to be registered with the application
      * @throws UniqueActionException If an Action already exists with the same
-     *                               name/type
+     *                               actionType
      */
-    public static void registerAction(String actionType, Payload payload) throws UniqueActionException {
-        if (Jadux.actions.containsKey(actionType)) {
+    public static void registerAction(Action<?> action) throws UniqueActionException {
+        if (Jadux.actions.containsKey(action.getType())) {
             throw new UniqueActionException();
         }
 
-        Jadux.actions.put(actionType, new Action(actionType, payload));
+        Jadux.actions.put(action.getType(), action);
     }
-
-    /**
-     * Registers a new application Action, which users can then instantiate with
-     * getApplicationAction() for Dispatch.send()
-     * 
-     * @param actionType The name of the ActionType the Action is to be associated
-     *                   with
-     * @throws UniqueActionException           If Action to be registered is not
-     *                                         unique (an Action is already
-     *                                         associated with this ActionType)
-     * @throws ActionTypeDoesNotExistException If ActionType to be associated with
-     *                                         does not exist
-     */
-    public static void registerAction(String actionType) throws UniqueActionException {
-        registerAction(actionType, null);
-    }
-
-    /**
-     * USER GETTERS
-     */
 
     /**
      * Grabs a user registered Action so a user can dispatch an action (e.g.
      * Dispatch.send(getApplicationAction("MY_ACTION")))
      * 
      * @param actionType The name of the associated ActionType
-     * @throws ActionTypeDoesNotExistException If the associated ActionType does not
-     *                                         exist
-     * @throws ActionDoesNotExistException     If the associated ActionType exists,
-     *                                         but no Action has been registered
-     *                                         with it
-     * @return The Action instance associated with the ActionType
+     * @throws ActionDoesNotExistException If no action exists under the requested
+     *                                     actionType
+     * @return The Action instance associated with the actionType
      */
-    public static Action getApplicationAction(String actionType) throws ActionDoesNotExistException {
+    public static Action<? extends JaduxData> getApplicationAction(String actionType)
+            throws ActionDoesNotExistException {
         if (!Jadux.actions.containsKey(actionType)) {
             throw new ActionDoesNotExistException();
         }
 
         return Jadux.actions.get(actionType);
+    }
+
+    /**
+     * Returns # of registered Reducers. Debugging tool.
+     * 
+     * @return The number of application registered Reducers
+     */
+    public static int getNumReducers() {
+        return Jadux.reducers.size();
+    }
+
+    /**
+     * Returns the # of registered Actions. Debugging tool.
+     * 
+     * @return The number of application registered Actions
+     */
+    public static int getNumActions() {
+        return Jadux.actions.size();
     }
 }
