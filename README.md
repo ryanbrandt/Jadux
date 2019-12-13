@@ -1,12 +1,10 @@
 # Jadux: State Management for Java Applications
 
-I like Redux, and got tired of manually figuring out state management everytime I pivoted over to Java. So I built Jadux, which provides a boilderplate and similiar patterns to those you probably know from Redux.
-
-If you're not familiar with Redux, [the docs may be a good start](https://redux.js.org/).
+I like Redux, and got tired of manually figuring out state management everytime I pivoted over to Java. So I built Jadux, which provides a boilerplate and similiar patterns to those you probably know from Redux.
 
 # Usage
 
-Jadux contains everything you know from Redux, action types, actions, reducers and your store.
+Jadux attempts to copy the big 3 from Redux, Actions, Reducers and your Store.
 
 ## Creating Your Store
 
@@ -18,49 +16,82 @@ import com.ryanbrandt.jadux.Jadux;
 Jadux.createStore();
 ```
 
-You're obviously limited to creating one store per application. Duh.
-Jadux won't nuke your state if you call createStore twice, but it will throw an exception.
+You're obviously limited to creating one store per application.
 
-## Defining Action Types and Actions
+## Defining Actions
 
 ```java
 import com.ryanbrandt.jadux.Jadux;
+import com.ryanbrandt.jadux.models.IntegerData;
 
 // ...
 
-Jadux.registerActionType("MY_ACTION_TYPE");
-Jadux.registerAction("MY_ACTION_TYPE");
+Jadux.registerAction(new Action<IntegerData>);
 ```
 
-This is slightly different from Redux where we'd do something like
+This is slightly different from Redux in JS where we'd do something like
 
 ```javascript
 const MY_ACTION_TYPE = "MY_ACTION_TYPE";
 
-const myAction = () => {
+const myAction = payload => {
   return {
     type: MY_ACTION_TYPE,
+    payload,
   };
 };
 ```
 
-If we need to pass a payload with our Action
+You must parameterize your Action-- this defines the type of payload your Action ships. Jadux includes models for typical payloads, String, Integer, and so on.
 
-But the same general idea applies. Create your action type, then create your action creator.
+If you need to define your own payload types, simply implement the JaduxData interface.
+
+```java
+public final class ArrayData implements JaduxData {
+    private ArrayList<Object> value;
+
+    public ArrayData(ArrayList<Object> value) {
+        this.value = value;
+    }
+
+    // ...
+```
 
 ## Defining Reducers
 
-Since we're using Java we're locked into OOP. So, when you go to create a Reducer, you need to implement the Jadux Reducer interface
+To get started defining your reducer, you must extend the Reducer class, and implement its abstract method, reduce.
+
+You can do this any way you would like, but I tried to mimic Redux patterns in the example. The general idea is to get a HashMap with the state key-values you would like to add or update.
+
+You <b>must</b> call commit at the end of your reduce method update state.
 
 ```java
 import com.ryanbrandt.jadux.Reducer;
 
-public class MyReducer implements Reducer {
+import static com.myapp.constants.Actions;
 
-    public void reduce(Action a) {
-        // ...
+public class TestReducer extends Reducer {
+
+        public void reduce(Action<? extends JaduxData> a) {
+            HashMap<String, JaduxData> updatedState = new HashMap<>();
+
+            switch (a.getType()) {
+
+            case INTEGER_DATA_ACTION: {
+                updatedState.put("foo", a.getPayload());
+                break;
+            }
+
+            case STRING_DATA_ACTION: {
+                updatedState.put("bar", a.getPayload());
+                break;
+            }
+
+            }
+
+            this.commit(updatedState);
+        }
     }
-}
 
 ```
 
@@ -76,7 +107,7 @@ import com.myapp.reducers.MyReducer;
 Jadux.registerReducer(new MyReducer());
 ```
 
-Similiar to Redux, it would make sense to seperate state into multiple Reducers where each Reducer deals with a logical grouping of state values.
+It would probably make sense to seperate state into multiple Reducers where each Reducer deals with a logical grouping of state key-values (e.g. SearchReducer, ShoppingCartReducer)
 
 ## Dispatching Actions
 
@@ -84,7 +115,14 @@ Similiar to Redux, it would make sense to seperate state into multiple Reducers 
 import com.ryanbrandt.jadux.Jadux;
 import com.ryanbrandt.jadux.action.Dispatch;
 
+import static com.myapp.constants.Actions;
+
 // ...
 
-Dispatch.send(Jadux.getApplicationAction("MY_ACTION_TYPE"));
+Dispatch.send(
+  Jadux.getApplicationAction(STRING_DATA_ACTION)
+          .setPayload(new StringData("jadux sucks"))
+);
 ```
+
+If we dont call setPayload every time we send an Action, you will send a null payload!

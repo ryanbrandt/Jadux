@@ -6,38 +6,33 @@ import org.junit.Assert;
 
 import com.ryanbrandt.jadux.action.Action;
 import com.ryanbrandt.jadux.application.Jadux;
-import com.ryanbrandt.jadux.models.IntegerData;
 import com.ryanbrandt.jadux.models.JaduxData;
-import com.ryanbrandt.jadux.models.StringData;
 import com.ryanbrandt.jadux.reducer.Reducer;
 
 import org.junit.Test;
 
 public class ReducerTest {
 
-    public class TestReducer implements Reducer {
+    public class TestReducer extends Reducer {
 
-        public HashMap<String, JaduxData> reduce(Action<? extends JaduxData> a, HashMap<String, JaduxData> state) {
+        public void reduce(Action<? extends JaduxData> a) {
+            HashMap<String, JaduxData> updatedState = new HashMap<>();
+
             switch (a.getType()) {
 
             case ActionTest.INTEGER_DATA_ACTION: {
-                state.replace("foo", new IntegerData(1));
-                return state;
+                updatedState.put("foo", a.getPayload());
+                break;
             }
 
             case ActionTest.STRING_DATA_ACTION: {
-                HashMap<String, JaduxData> updatedValues = new HashMap<>();
-                {
-                    updatedValues.put("bar", new StringData("yeet"));
-                }
-                return updatedValues;
-            }
-
-            default: {
-                return state;
+                updatedState.put("bar", a.getPayload());
+                break;
             }
 
             }
+
+            this.commit(updatedState);
         }
     }
 

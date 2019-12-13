@@ -1,6 +1,8 @@
 package com.ryanbrandt.jadux.application;
 
 import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
 
 import com.ryanbrandt.jadux.reducer.Reducer;
 import com.ryanbrandt.jadux.action.Action;
@@ -12,7 +14,7 @@ import com.ryanbrandt.jadux.models.JaduxData;
  * 
  * @author Ryan Brandt
  */
-public final class Jadux {
+public final class Jadux implements Observer {
     private static Store store;
     private static HashMap<String, Action<? extends JaduxData>> actions = new HashMap<>();
     private static HashMap<String, Reducer> reducers = new HashMap<>();
@@ -34,6 +36,10 @@ public final class Jadux {
 
         Jadux.store = new Store();
     }
+
+    /*****************************
+     * USER SETTERS
+     ****************************/
 
     /**
      * Registers a new application Reducer
@@ -60,6 +66,10 @@ public final class Jadux {
         Jadux.actions.put(action.getType(), action);
     }
 
+    /*****************************
+     * USER GETTERS
+     ****************************/
+
     /**
      * Grabs a user registered Action so a user can dispatch an action (e.g.
      * Dispatch.send(getApplicationAction("MY_ACTION")))
@@ -77,6 +87,20 @@ public final class Jadux {
 
         return Jadux.actions.get(actionType);
     }
+
+    /*****************************
+     * REDUCER OBSERVATION
+     ****************************/
+
+    @SuppressWarnings("unchecked")
+    public void update(Observable obj, Object arg) {
+        HashMap<String, JaduxData> updatedState = (HashMap<String, JaduxData>) arg;
+        Jadux.store.updateState(updatedState);
+    }
+
+    /*****************************
+     * DEBUGGING UTILITIES
+     ****************************/
 
     /**
      * Returns # of registered Reducers. Debugging tool.

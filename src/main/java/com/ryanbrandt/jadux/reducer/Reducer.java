@@ -1,6 +1,7 @@
 package com.ryanbrandt.jadux.reducer;
 
 import java.util.HashMap;
+import java.util.Observable;
 
 import com.ryanbrandt.jadux.action.Action;
 import com.ryanbrandt.jadux.models.JaduxData;
@@ -11,12 +12,22 @@ import com.ryanbrandt.jadux.models.JaduxData;
  * 
  * @author Ryan Brandt
  */
-public interface Reducer {
+public abstract class Reducer extends Observable {
 
     /**
      * Defines how an action is applied to state.
      * 
      * @param a The Action to act on State
      */
-    public HashMap<String, JaduxData> reduce(Action<? extends JaduxData> a, HashMap<String, JaduxData> state);
+    public abstract void reduce(Action<? extends JaduxData> a);
+
+    /**
+     * Commits changes specified in reduce to the store. Really just a wrapper to
+     * hide some internals.
+     * 
+     * @param updatedState The changes in state specified through reduce
+     */
+    protected void commit(HashMap<String, JaduxData> updatedState) {
+        notifyObservers(updatedState);
+    }
 }
